@@ -4,8 +4,9 @@ vmware_snapshot_tool
 A pysphere script for basic snapshot management (create, delete, list, revert).
 
 ``` bash
-./vmware_snapshot_tool.py -h
-usage: vmware_snapshot_tool.py [-h] -s SERVER -u USERNAME -m VMNAME [-v] [-V]
+./vmware_snapshot_tool.py  -h
+usage: vmware_snapshot_tool.py [-h] -s SERVER -u USERNAME -m VMNAME [-v] [-d]
+                               [-l LOGFILE] [-V]
                                {revert,create,list,delete} ...
 
 Manage VM snapshots. Create, Delete, List and Revert to Snapshot.
@@ -27,78 +28,54 @@ optional arguments:
   -m VMNAME, --vm VMNAME
                         The virtual machine (VM) to manage snapshots
   -v, --verbose         Enable verbose output
+  -d, --debug           Enable debug output
+  -l LOGFILE, --log-file LOGFILE
+                        File to log to (default = stdout)
   -V, --version         show program's version number and exit
 ```    
 
 For instance, listing snapshots taken of a certain VM:
 
 ``` bash
-./vmware_snapshot_tool.py -s 198.100.234.200 -u vma -m dijkstra list
-Enter password for vCenter 198.100.234.200 for user vma: 
-Successfully found dijkstra in [datastore1] dijkstra/dijkstra.vmx
- 
-OK. Found 2 snapshot(s). Will take a few secs to list them...
- 
-Snapshot(s) found:
-Name: Snap2014-02-08@2
-Description Testing new features
-Created: (2014, 2, 10, 14, 0, 14, 850, 0, 0)
-State: poweredOn
-Path: /Snap2014-02-08@2
- 
-Name: Snap2014-02-08@3
-Description Testing new features
-Created: (2014, 2, 10, 14, 27, 37, 78, 0, 0)
-State: poweredOn
-Path: /Snap2014-02-08@2/Snap2014-02-08@3
-
+./vmware_snapshot_tool.py -s 198.100.234.200 -u vma -m dijkstra -d list
+2014-02-25 12:47:33,937 DEBUG logger initialized
+2014-02-25 12:47:33,937 DEBUG No command line password received, requesting password from user
+Enter password for vCenter 198.100.234.200 for user vma:
+2014-02-25 12:47:35,960 INFO Connecting to server 198.100.234.200 with username vma
+2014-02-25 12:47:35,960 DEBUG Trying to connect with provided credentials
+2014-02-25 12:47:36,515 INFO Connected to server 198.100.234.200
+2014-02-25 12:47:36,515 DEBUG Server type: VMware vCenter Server
+2014-02-25 12:47:36,516 DEBUG API version: 5.1
+2014-02-25 12:47:39,731 DEBUG Found VM 1307P-dijkstra
+2014-02-25 12:47:39,731 INFO Successfully found 1307P-dijkstra in [datastore1] dijkstra_1/dijkstra.vmx
+2014-02-25 12:47:39,731 DEBUG Listing all snapshots as requested by user.
+2014-02-25 12:47:40,223 DEBUG  Found 1 snapshot(s). Will take a few secs to list.
+2014-02-25 12:47:40,223 INFO 1 snapshot(s) found.
+{'snapshot-3337': {'Created': (2014, 2, 25, 12, 19, 6, 897, 0, 0),
+                   'Description': 'description1',
+                   'Name': 't1',
+                   'Path': '/t1',
+                   'State': 'poweredOn'}}
+2014-02-25 12:47:40,223 DEBUG Terminating vCenter session.
 ``` 
 
 Creating a snapshot:
 
 ``` bash
  ./vmware_snapshot_tool.py -s 198.100.234.200 -u vma -m dijkstra create -sn Snap2014-02-08@3 -sd "Testing new features"
+2014-02-25 12:52:08,142 DEBUG logger initialized
+2014-02-25 12:52:08,142 DEBUG No command line password received, requesting password from user
 Enter password for vCenter 198.100.234.200 for user vma: 
-Successfully found dijkstra in [datastore1] dijkstra/dijkstra.vmx
- 
-Creating snapshot on dijkstra with the following attributes: 
-Snapshot name: Snap2014-02-08@3
-Snapshot Description: Testing new features
-Run Synchronously: False
- 
-OK. Creating Snapshot...
-Task running asynchronously. This might take a few minutes.
+2014-02-25 12:52:10,315 INFO Connecting to server 198.100.234.200 with username vma
+2014-02-25 12:52:10,316 DEBUG Trying to connect with provided credentials
+2014-02-25 12:52:10,841 INFO Connected to server 198.100.234.200
+2014-02-25 12:52:10,842 DEBUG Server type: VMware vCenter Server
+2014-02-25 12:52:10,842 DEBUG API version: 5.1
+2014-02-25 12:52:14,057 DEBUG Found VM 1307P-dijkstra
+2014-02-25 12:52:14,057 INFO Successfully found dijkstra in [datastore1] dijkstra_1/dijkstra.vmx
+2014-02-25 12:52:14,057 DEBUG Creating snapshot as requested by user.
+2014-02-25 12:52:14,058 INFO Creating snapshot on dijkstra with the following attributes: Name: Snap2014-02-08@3; Description: Testing new features; Run Sync: False
+2014-02-25 12:52:14,318 WARNING Task running asynchronously. This might take a few minutes.
+2014-02-25 12:52:14,319 DEBUG Terminating vCenter session.
 
-```
-
-Deleting snapshot:
-
-``` bash
- ./vmware_snapshot_tool.py -s 198.100.234.200 -u vma -m dijkstra delete -sn Snap2014-02-08@3 
- Enter password for vCenter 198.100.234.200 for user vma: 
- Successfully found dijkstra in [datastore1] dijkstra/dijkstra.vmx
- 
- Deleting snapshot of dijkstra: 
- Snapshot name: Snap2014-02-08@3
- Run Synchronously: False
- Delete children: False
- 
- OK. Deleting Snapshot...
- Task running asynchronously. This might take a few minutes.
-
-```
-
-Reverting to a specific snapshot:
-
-``` bash
-./vmware_snapshot_tool.py -s 198.100.234.200 -u vma -m dijkstra revert -sn Snap2014-02-08@2
-Enter password for vCenter 198.100.234.200 for user vma: 
-Successfully found dijkstra in [datastore1] dijkstra/dijkstra.vmx
- 
-Reverting snapshot on dijkstra with the following attributes: 
-Snapshot name: Snap2014-02-08@2
-Run Synchronously: False
- 
-OK. Reverting to requested Snapshot...
-Task running asynchronously. This process might take a few minutes.
 ```
