@@ -67,6 +67,7 @@ def get_args():
     parser = argparse.ArgumentParser(description="Manage VM snapshots. Create, Delete, List and Revert to Snapshot.")
     parser.add_argument('-s', '--server', nargs=1, required=True, help='The vCenter or ESXi server to connect to', dest='server', type=str)
     parser.add_argument('-u', '--user', nargs=1, required=True, help='The username with which to connect to the server', dest='username', type=str)
+    parser.add_argument('-p', '--password', nargs=1, required=False, help='The password with which to connect to the host. If not specified, the user is prompted at runtime for a password', dest='password', type=str)
     parser.add_argument('-m', '--vm', nargs=1, required=True, help='The virtual machine (VM) to manage snapshots', dest='vmname', type=str)
     parser.add_argument('-v', '--verbose', required=False, help='Enable verbose output', dest='verbose', action='store_true')
     parser.add_argument('-d', '--debug', required=False, help='Enable debug output', dest='debug', action='store_true')
@@ -166,8 +167,7 @@ try:
         logger.debug('Listing all snapshots as requested by user.')
         list = args.lall
     	list_snapshot(vm)
-    	con.disconnect()
-    	sys.exit()
+    	pass
     elif hasattr(args, 'sname'):
         logger.debug('Creating snapshot as requested by user.')
     	# Parse create opt
@@ -175,24 +175,21 @@ try:
     	snapdesc        = args.sdesc
         snaprun         = args.ssync
     	create_snapshot(vm, snapname, snapdesc, snaprun)
-    	con.disconnect()
-    	sys.exit()
+	pass
     elif hasattr(args, 'snamed'):
         logger.debug('Deleting snapshot as requested by user.')
     	snapnamed 	= args.snamed
     	snaprun 	= args.ssync
     	children	= args.children
     	delete_snapshot(vm, snapnamed, snaprun, children)
-    	con.disconnect()
-    	sys.exit()
+    	pass
     elif hasattr(args, 'snamer'):
         logger.debug('Reverting snapshot as requested by user.')
     	snapnamer	= args.snamer
     	snaprun		= args.ssync
     	revert_snapshot(vm, snapnamer, snaprun)
-    	con.disconnect()
-    	sys.exit()
-        
+    	pass
+    logger.debug('Terminating vCenter session.')        
     con.disconnect()
 except VIException as inst:
     logger.error(inst)
