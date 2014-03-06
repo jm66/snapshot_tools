@@ -46,8 +46,8 @@ Enter password for vCenter 198.100.234.200 for user vma:
 2014-02-25 12:47:36,515 INFO Connected to server 198.100.234.200
 2014-02-25 12:47:36,515 DEBUG Server type: VMware vCenter Server
 2014-02-25 12:47:36,516 DEBUG API version: 5.1
-2014-02-25 12:47:39,731 DEBUG Found VM 1307P-dijkstra
-2014-02-25 12:47:39,731 INFO Successfully found 1307P-dijkstra in [datastore1] dijkstra_1/dijkstra.vmx
+2014-02-25 12:47:39,731 DEBUG Found VM dijkstra
+2014-02-25 12:47:39,731 INFO Successfully found dijkstra in [datastore1] dijkstra_1/dijkstra.vmx
 2014-02-25 12:47:39,731 DEBUG Listing all snapshots as requested by user.
 2014-02-25 12:47:40,223 DEBUG  Found 1 snapshot(s). Will take a few secs to list.
 2014-02-25 12:47:40,223 INFO 1 snapshot(s) found.
@@ -71,7 +71,7 @@ Enter password for vCenter 198.100.234.200 for user vma:
 2014-02-25 12:52:10,841 INFO Connected to server 198.100.234.200
 2014-02-25 12:52:10,842 DEBUG Server type: VMware vCenter Server
 2014-02-25 12:52:10,842 DEBUG API version: 5.1
-2014-02-25 12:52:14,057 DEBUG Found VM 1307P-dijkstra
+2014-02-25 12:52:14,057 DEBUG Found VM dijkstra
 2014-02-25 12:52:14,057 INFO Successfully found dijkstra in [datastore1] dijkstra_1/dijkstra.vmx
 2014-02-25 12:52:14,057 DEBUG Creating snapshot as requested by user.
 2014-02-25 12:52:14,058 INFO Creating snapshot on dijkstra with the following attributes: Name: Snap2014-02-08@3; Description: Testing new features; Run Sync: False
