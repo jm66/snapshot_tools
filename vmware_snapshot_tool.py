@@ -126,6 +126,7 @@ else:
 # Initializing logger
 if log_file:
 	logging.basicConfig(filename=log_file,format='%(asctime)s %(levelname)s %(message)s',level=log_level)
+	logger = logging.getLogger(__name__)
 else:
 	logging.basicConfig(filename=log_file,format='%(asctime)s %(levelname)s %(message)s',level=log_level)
 	logger = logging.getLogger(__name__)
