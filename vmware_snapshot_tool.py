@@ -1,8 +1,22 @@
 #!/usr/bin/python
-import logging, sys, re, getpass, argparse, pprint
+import logging, sys, re, getpass, argparse, pprint, smtplib
 from pysphere import MORTypes, VIServer, VITask, VIProperty, VIMor, VIException
 from pysphere.vi_virtual_machine import VIVirtualMachine
-		
+from email.mime.text import MIMEText
+from datetime import datetime
+
+def send_logs(address, logfile):
+  fp = open(logfile, 'rb')
+  msg = MIMEText(fp.read())
+  fp.close()
+  from_add = "vi-admin@vma5.dcb.eis.utoronto.ca"
+  msg['Subject'] = 'Snapshot tool log file %s' % logfile
+  msg['From'] = from_add
+  msg['To'] = address
+  s = smtplib.SMTP('localhost')
+  s.sendmail(from_add, [address], msg.as_string())
+  s.quit()
+
 def find_vm(name, con):
    try:
         vm = con.get_vm_by_name(name)
@@ -10,6 +24,11 @@ def find_vm(name, con):
         return vm
    except VIException:
           return None
+
+def parseSNDate(datetuple):
+  t = datetuple
+  dt = datetime(*t[:6])
+  return dt.strftime('%Y-%m-%d %H:%M:%S')
 
 def list_snapshot(vm):
    try:
@@ -20,8 +39,9 @@ def list_snapshot(vm):
       if len(snapshot_list) > 0:
             logger.info('%d snapshot(s) found.' % snapshot_list_len)
             for snapshot in snapshot_list:
-                snapshot_dict[snapshot._mor] = {'Name': snapshot.get_name(), 'Description': snapshot.get_description(), 'Created': snapshot.get_create_time(), 'State': snapshot.get_state(), 'Path': snapshot.get_path()}
-            pprint.pprint(snapshot_dict)
+                logger.warn('Id: %s; Name: %s; Description: %s; Created: %s; State: %s; Path: %s' %(snapshot._mor, snapshot.get_name(), snapshot.get_description(), parseSNDate(snapshot.get_create_time()), snapshot.get_state(), snapshot.get_path() ))
+                snapshot_dict[snapshot._mor] = {'Name': snapshot.get_name(), 'Description': snapshot.get_description(), 'Created': parseSNDate(snapshot.get_create_time()), 'State': snapshot.get_state(), 'Path': snapshot.get_path()}
+            # pprint.pprint(snapshot_dict)
       else:
             logger.warning('No snapshots found related to this VM')
    except VIException as inst:
@@ -126,7 +146,6 @@ else:
 # Initializing logger
 if log_file:
 	logging.basicConfig(filename=log_file,format='%(asctime)s %(levelname)s %(message)s',level=log_level)
-	logger = logging.getLogger(__name__)
 else:
 	logging.basicConfig(filename=log_file,format='%(asctime)s %(levelname)s %(message)s',level=log_level)
 	logger = logging.getLogger(__name__)
