@@ -5,18 +5,6 @@ from pysphere.vi_virtual_machine import VIVirtualMachine
 from email.mime.text import MIMEText
 from datetime import datetime
 
-def send_logs(address, logfile):
-  fp = open(logfile, 'rb')
-  msg = MIMEText(fp.read())
-  fp.close()
-  from_add = "vi-admin@vma5.dcb.eis.utoronto.ca"
-  msg['Subject'] = 'Snapshot tool log file %s' % logfile
-  msg['From'] = from_add
-  msg['To'] = address
-  s = smtplib.SMTP('localhost')
-  s.sendmail(from_add, [address], msg.as_string())
-  s.quit()
-
 def find_vm(name, con):
    try:
         vm = con.get_vm_by_name(name)
