@@ -51,11 +51,7 @@ Enter password for vCenter 198.100.234.200 for user vma:
 2014-02-25 12:47:39,731 DEBUG Listing all snapshots as requested by user.
 2014-02-25 12:47:40,223 DEBUG  Found 1 snapshot(s). Will take a few secs to list.
 2014-02-25 12:47:40,223 INFO 1 snapshot(s) found.
-{'snapshot-3337': {'Created': (2014, 2, 25, 12, 19, 6, 897, 0, 0),
-                   'Description': 'description1',
-                   'Name': 't1',
-                   'Path': '/t1',
-                   'State': 'poweredOn'}}
+2014-02-25 12:47:40,223 WARNING Id: snapshot-3337; Name: t1; Description: description1; Created: 2014-02-25 12:18:12; State: poweredOff; Path: /t1
 2014-02-25 12:47:40,223 DEBUG Terminating vCenter session.
 ``` 
 
