@@ -283,13 +283,13 @@ try:
       if hasattr(args, 'notif'):
         logger.debug('Sending notification to %s from %s' % (args.notif, from_snap))
         if i == 0:
-          message = '[%s] Snapshot [Name: %s] was [%s]' % (action[4], snamer, status[0])
-          sendNotification(from_snap, args.notif, action[1], status[0], message, vm.properties.name)
+          message = '[%s] Snapshot [Name: %s] was [%s]' % (action[4], snapnamer, status[0])
+          sendNotification(from_snap, args.notif, action[4], status[0], message, vm.properties.name)
         elif i == 1:
-          message = '[%s] Snapshot [Name: %s] was [%s]' % (action[4], snamer, status[1])
-          sendNotification(from_snap, args.notif, action[1], status[1], message, vm.properties.name)
+          message = '[%s] Snapshot [Name: %s] was [%s]' % (action[4], snapnamer, status[1])
+          sendNotification(from_snap, args.notif, action[4], status[1], message, vm.properties.name)
         elif i == 2:
-          message = '[%s] Snapshot [Name: %s] was [%s]' % (action[4], snamer, status[2])
+          message = '[%s] Snapshot [Name: %s] was [%s]' % (action[4], snapnamer, status[2])
           sendNotification(from_snap, args.notif, action[4], status[2], message, vm.properties.name)
       pass
     logger.debug('Terminating vCenter session.')        
