@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import logging, sys, re, getpass, argparse, pprint, smtplib
+import logging, sys, re, getpass, argparse, pprint, smtplib, base64, binascii
 from pysphere import MORTypes, VIServer, VITask, VIProperty, VIMor, VIException
 from pysphere.vi_virtual_machine import VIVirtualMachine
 from email.mime.text import MIMEText
@@ -108,7 +108,8 @@ def get_args():
     parser = argparse.ArgumentParser(description="Manage VM snapshots. Create, Delete, List and Revert to Snapshot.")
     parser.add_argument('-s', '--server', nargs=1, required=True, help='The vCenter or ESXi server to connect to', dest='server', type=str)
     parser.add_argument('-u', '--user', nargs=1, required=True, help='The username with which to connect to the server', dest='username', type=str)
-    parser.add_argument('-p', '--password', nargs=1, required=False, help='The password with which to connect to the host. If not specified, the user is prompted at runtime for a password', dest='password', type=str)
+    parser.add_argument('-p', '--password', nargs=1, required=False, help='The password in plain text with which to connect to the host. If not specified, the user is prompted at runtime for a password.', dest='password', type=str)
+    parser.add_argument('-pe', '--password-encrypted', nargs=1, required=False, help='The password encrypted using Base64 with which to connect to the host. ', dest='passwordEncrypted', type=str)
     parser.add_argument('-m', '--vm', nargs=1, required=True, help='The virtual machine (VM) to manage snapshots', dest='vmname', type=str)
     parser.add_argument('-v', '--verbose', required=False, help='Enable verbose output', dest='verbose', action='store_true')
     parser.add_argument('-d', '--debug', required=False, help='Enable debug output', dest='debug', action='store_true')
@@ -126,20 +127,20 @@ def get_args():
     create_parser.add_argument('-sn', '--sname', required=True, action='store', help='New snapshot name', dest='sname', type=str)
     create_parser.add_argument('-sd', '--sdescription', required=True, help='New snapshot description.', action='store', dest='sdesc', type=str)
     create_parser.add_argument('-sr', '--syncrun', default=False, help='Take snapshot synchronously, default is False', dest='ssync', action='store_true')
-    create_parser.add_argument('-no', '--notification', required=True, help='Send email notification to included email address(es).', action='store', dest='notif', type=str)
+    create_parser.add_argument('-no', '--notification', required=False, help='Send email notification to included email address(es).', action='store', dest='notif', type=str)
 
     # A delete command
     delete_parser = subparsers.add_parser('delete', help='Delete a Snapshot of a given VM')
     delete_parser.add_argument('-sn', '--sname', action='store', required=True, help='Name of the snapshot to delete', dest='snamed', type=str)
     delete_parser.add_argument('-sr', '--syncrun', default=False, help='Delete snapshot synchronously, default is False', dest='ssync', action='store_true')
     delete_parser.add_argument('-ch', '--children', default=False, help='Will delete not only the specified snapshot but also all of its descendants, default is False', dest='children', action='store_true')
-    delete_parser.add_argument('-no', '--notification', required=True, help='Send email notification to included email address(es).', action='store', dest='notif', type=str)
+    delete_parser.add_argument('-no', '--notification', required=False, help='Send email notification to included email address(es).', action='store', dest='notif', type=str)
 
     # A revert command
     revert_parser = subparsers.add_parser('revert', help='Revert to a Snapshot of a given VM')
     revert_parser.add_argument('-sn', '--sname', action='store', required=True, help='Name of the snapshot to revert', dest='snamer', type=str)
     revert_parser.add_argument('-sr', '--syncrun', default=False, help='Revert to snapshot synchronously, default is False', dest='ssync', action='store_true')
-    revert_parser.add_argument('-no', '--notification', required=True, help='Send email notification to included email address(es).', action='store', dest='notif', type=str)
+    revert_parser.add_argument('-no', '--notification', required=False, help='Send email notification to included email address(es).', action='store', dest='notif', type=str)
 
     args = parser.parse_args()
     return args
@@ -183,10 +184,21 @@ else:
 logger = logging.getLogger(__name__)
 logger.debug('logger initialized')
 
+try:
+  logger.debug('Using encrypted password. Decrypting now.')
+  if args.passwordEncrypted:
+    password = base64.b64decode(args.passwordEncrypted[0])
+except Exception:
+  logger.error(e)
+  logger.debug('Password error. Either this is not an encrypted passowrd or is not well formated.')
+  sys.exit()
+
 # Asking Users password for server
 if password is None:
-	logger.debug('No command line password received, requesting password from user')
+	logger.debug('No command line password received, requesting plain text password from user.')
         password = getpass.getpass(prompt='Enter password for vCenter %s for user %s: ' % (server,username))
+
+logger.debug(password)
 
 # Connecting to server
 logger.info('Connecting to server %s with username %s' % (server,username))
